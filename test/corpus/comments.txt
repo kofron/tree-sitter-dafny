@@ -1,0 +1,55 @@
+==================
+Nested block comment
+==================
+/* outer /* inner */ tail */
+module M {}
+
+---
+
+(source_file
+  (block_comment)
+  (module_definition
+    (qualified_name (identifier))
+    (module_body)))
+
+==================
+Consecutive stars
+==================
+/** **/
+module M {}
+
+---
+
+(source_file
+  (block_comment)
+  (module_definition
+    (qualified_name (identifier))
+    (module_body)))
+
+==================
+Three closing stars
+==================
+/* / ** ***/
+module M {}
+
+---
+
+(source_file
+  (block_comment)
+  (module_definition
+    (qualified_name (identifier))
+    (module_body)))
+
+==================
+Nested Unicode comment
+==================
+/* café /* 🚀 */ fin */
+module M {}
+
+---
+
+(source_file
+  (block_comment)
+  (module_definition
+    (qualified_name (identifier))
+    (module_body)))

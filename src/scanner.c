@@ -20,6 +20,7 @@ enum TokenType {
   CARET,            // ^  bitwise XOR
   AMPERSAND,        // &  bitwise AND
   AMP_AMP,          // && logical AND
+  BLOCK_COMMENT,    // /* ... */ (nestable)
 };
 
 // ---- Helpers ----
@@ -245,6 +246,38 @@ bool tree_sitter_dafny_external_scanner_scan(void *payload, TSLexer *lexer, cons
   ScannerState *state = (ScannerState*)payload;
 
   // No error recovery guard — tokens are external-only, must always handle
+
+  // Comments can nest in Dafny. Scan the complete token without modifying the
+  // expression scanner's persistent state, including on failed/partial scans.
+  skip_ws(lexer);
+  if (valid_symbols[BLOCK_COMMENT] && lexer->lookahead == '/') {
+    lexer->advance(lexer, false);
+    if (lexer->lookahead != '*') return false;
+    lexer->advance(lexer, false);
+    unsigned depth = 1;
+    while (!lexer->eof(lexer)) {
+      if (lexer->lookahead == '/') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '*') {
+          lexer->advance(lexer, false);
+          depth++;
+        }
+      } else if (lexer->lookahead == '*') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '/') {
+          lexer->advance(lexer, false);
+          if (--depth == 0) {
+            lexer->mark_end(lexer);
+            lexer->result_symbol = BLOCK_COMMENT;
+            return true;
+          }
+        }
+      } else {
+        lexer->advance(lexer, false);
+      }
+    }
+    return false;
+  }
 
   // ---- Handle '>' ----
   if (valid_symbols[GENERIC_CLOSE]) {

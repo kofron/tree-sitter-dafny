@@ -51,6 +51,7 @@ module.exports = grammar({
     $._caret,           // ^  bitwise XOR
     $._ampersand,       // &  bitwise AND
     $._amp_amp,         // && logical AND
+    $.block_comment,    // nested block comments
   ],
 
   word: $ => $.identifier,
@@ -186,7 +187,6 @@ module.exports = grammar({
     // ========== Comments ==========
 
     line_comment: _ => token(seq('//', /[^\n]*/)),
-    block_comment: _ => token(seq('/*', /(\*[^/]|[^*])*/, '*/')),
 
     // ========== Include ==========
 
