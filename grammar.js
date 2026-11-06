@@ -1016,11 +1016,11 @@ module.exports = grammar({
       /[0-9]([0-9_]*[0-9])?e[+-]?[0-9]([0-9_]*[0-9])?/,
     )),
     boolean_literal: _ => choice('true', 'false'),
-    char_literal: _ => seq("'", choice(/[^'\\]/, /\\U\{[0-9a-fA-F]+\}/, /\\u[0-9a-fA-F]{4}/, seq('\\', /./)), "'"),
-    string_literal: _ => choice(
+    char_literal: _ => token(seq("'", choice(/[^'\\]/, /\\U\{[0-9a-fA-F]+\}/, /\\u[0-9a-fA-F]{4}/, seq('\\', /./)), "'")),
+    string_literal: _ => token(choice(
       seq('"', repeat(choice(/[^"\\]+/, /\\U\{[0-9a-fA-F]+\}/, /\\u[0-9a-fA-F]{4}/, seq('\\', /./), /\\\n/)), '"'),
       seq('@', '"', repeat(choice(/[^"]+/, '""')), '"'),
-    ),
+    )),
     null_literal: _ => 'null',
 
     // ========== Identifier ==========

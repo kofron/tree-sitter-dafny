@@ -53,3 +53,21 @@ module M {}
   (module_definition
     (qualified_name (identifier))
     (module_body)))
+
+==================
+Comment delimiters inside string literals
+==================
+include "/* not a comment */"
+include "// not a comment"
+include @"/* ""quoted"" */"
+module M {}
+
+---
+
+(source_file
+  (include_directive (string_literal))
+  (include_directive (string_literal))
+  (include_directive (string_literal))
+  (module_definition
+    (qualified_name (identifier))
+    (module_body)))
